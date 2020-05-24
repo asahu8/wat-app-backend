@@ -33,6 +33,10 @@
     "start": "set debug=* && ts-node-dev --respawn --transpileOnly ./src/index.ts",
     "prod": "tsc && node ./build/app.js",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run"
+  },
+  "engines": {
+    "node": "12.16.x",
+    "npm": "6.4"
+
   }
 }
-
