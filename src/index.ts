@@ -19,6 +19,7 @@ createConnection()
 
     //Set all routes from routes folder
     app.use("/", routes);
+    app.get('/', (req, res) => res.send('Yes, Server is up and running!😷'))
 
     app.listen(4001, () => {
       console.log("💃🏻 Server started on port 4001! 🕺🏻");
