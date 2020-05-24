@@ -46,7 +46,7 @@ export class User {
   @Column({default: 0 })
   livesUplifted: number;
 
-  @Column({default: false })
+  @Column({default: 0 })
   fundsLives: number;
 
   @Column({default: null})
