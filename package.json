@@ -20,13 +20,13 @@
     "express": "^4.17.1",
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
+    "mem": ">=4.0.0",
+    "minimist": ">=0.2.1",
     "mysql": "^2.18.1",
     "pg": "^8.2.1",
     "reflect-metadata": "^0.1.10",
     "ts-node-dev": "^1.0.0-pre.44",
-    "typeorm": "0.2.12",
-    "minimist": ">=0.2.1",
-    "mem": ">=4.0.0"
+    "typeorm": "0.2.12"
   },
   "scripts": {
     "tsc": "tsc",
@@ -37,6 +37,5 @@
   "engines": {
     "node": "12.16.x",
     "npm": "6.4"
-
   }
 }
