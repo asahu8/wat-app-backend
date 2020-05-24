@@ -42,7 +42,7 @@
 ```
   npm install
   npm start // will create/update tables at run time
-  💃🏻 Server started on port 3000! 🕺
+  💃🏻 Server started on port 4001! 🕺
   npm run migration:run // execute pending migrations
 ```
 
