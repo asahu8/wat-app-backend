@@ -35,7 +35,7 @@ export class Event {
   @Length(4, 30)
   location: string;
 
-  @Column()
+  @Column({ default: true})
   active: boolean;
 
   @Column()
