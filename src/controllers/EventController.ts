@@ -39,7 +39,7 @@ class EventController{
       res.status(500).send("something went wrong");
       return;
     }
-    res.status(201).send("Event created");
+    setTimeout(() => {  res.status(201).send("Event created"); }, 3000);
   };
 
   static deleteEvent = async (req: Request, res: Response) => {
@@ -90,14 +90,15 @@ class EventController{
       res.status(409).send("some issue occured");
       return;
     }
-    res.status(204).send();
+    setTimeout(() => { res.status(204).send(); }, 3000);
+
   };
 
   static listEventCards = async(req: Request, res: Response) => {
     res.status(201).send({
       data: [
-        { cardType: "past", cardName: "past events", eventCount: 50 },
-        { cardType: "future", cardName: "future events", eventCount: 15 }
+        { id: 1, cardType: "past", cardName: "past events", eventCount: 50 },
+        { id: 2, cardType: "future", cardName: "future events", eventCount: 15 }
       ]
     })
   }

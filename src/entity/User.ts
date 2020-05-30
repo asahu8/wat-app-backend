@@ -81,7 +81,6 @@ export class User {
 
 
   @Column({ default: null})
-  @Length(4, 100)
   resetPasswordToken: string;
 
   @Column({default: null})
