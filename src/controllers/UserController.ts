@@ -44,7 +44,25 @@ static getOneById = async (req: Request, res: Response) => {
   const userRepository = getRepository(User);
   try {
     const user = await userRepository.findOneOrFail(id, {
-      select: ["id"] //We dont want to send the password on response
+      select: [
+        "id",
+        "firstName",
+        "lastName",
+        "username",
+        "email",
+        "dateOfBirth",
+        "phoneNumber",
+        "contributionAmount",
+        "livesUplifted",
+        "fundsLives",
+        "companyName",
+        "designation",
+        "location",
+        "areasOfInterest",
+        "active",
+        "isAdmin",
+        "role"
+      ] //We dont want to send the password on response
     });
     res.send(user);
   } catch (error) {
