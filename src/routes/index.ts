@@ -6,6 +6,7 @@ import footer from './footer';
 
 const routes = Router();
 
+routes.use("/auth", auth);
 routes.use("/contributors", user);
 routes.use("/events", event);
 routes.use("/footer-contents", footer);

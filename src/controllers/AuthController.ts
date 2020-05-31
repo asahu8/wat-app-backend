@@ -5,6 +5,7 @@ import { validate } from "class-validator";
 
 import { User } from "../entity/User";
 import config from "../config/config";
+import cookieParser = require("cookie-parser");
 
 class AuthController {
   static login = async (req: Request, res: Response) => {
@@ -19,25 +20,30 @@ class AuthController {
     let user: User;
     try {
       user = await userRepository.findOneOrFail({ where: { username } });
-    } catch (error) {
-      res.status(401).send();
+    }catch (error) {
+      res.status(401).send( { status: 401, key: "invalid_account", message: 'Invalid account'});
     }
 
     //Check if encrypted password match
     if (!user.checkIfUnencryptedPasswordIsValid(password)) {
-      res.status(401).send();
+      res.status(401).send( { status: 401, key: "invalid_login", message: 'incorrect password entered'});
       return;
     }
 
-    //Sing JWT, valid for 1 hour
+    //sign JWT, valid for 1 hour
     const token = jwt.sign(
       { userId: user.id, username: user.username },
       config.jwtSecret,
       { expiresIn: "1h" }
     );
 
+    // const cookieOptions = { httpOnly: true };
+    const cookieOptions = { };
+
     //Send the jwt in the response
-    res.send(token);
+    res.status(200)
+      .cookie('auth-token', token, cookieOptions)
+      .send( { status: 200, authToken: token } );
   };
 
   static changePassword = async (req: Request, res: Response) => {
