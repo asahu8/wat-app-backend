@@ -6,7 +6,6 @@ import * as helmet from "helmet";
 import * as cors from "cors";
 import routes from "./routes";
 
-//Connects to the Database -> then starts the express
 createConnection()
   .then(async connection => {
     // Create a new express application instance
@@ -19,7 +18,9 @@ createConnection()
 
     //Set all routes from routes folder
     app.use("/", routes);
-    app.get('/', (req, res) => res.send('Yes, Server is up and running!😷'))
+    app.get('/', (req, res) => {
+      res.send('Yes, Server is up and running!😷')
+    });
 
     app.listen(4001, () => {
       console.log("💃🏻 Server started on port 4001! 🕺🏻");

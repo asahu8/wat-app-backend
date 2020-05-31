@@ -35,7 +35,6 @@ class EventController{
     try {
       await eventRepository.save(eventData);
     } catch (e) {
-      console.log(e);
       res.status(500).send("something went wrong");
       return;
     }
@@ -78,7 +77,6 @@ class EventController{
     event.active = active;
     const errors = await validate(event);
     if (errors.length > 0) {
-      console.log(event);
       res.status(400).send(errors);
       return;
     }
@@ -95,12 +93,10 @@ class EventController{
   };
 
   static listEventCards = async(req: Request, res: Response) => {
-    res.status(201).send({
-      data: [
-        { id: 1, cardType: "past", cardName: "past events", eventCount: 50 },
-        { id: 2, cardType: "future", cardName: "future events", eventCount: 15 }
-      ]
-    })
+    res.status(201).send([
+      { id: 1, cardType: "past", cardName: "past events", eventCount: 50 },
+      { id: 2, cardType: "future", cardName: "future events", eventCount: 15 }
+    ]);
   }
 }
 
