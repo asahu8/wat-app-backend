@@ -4,16 +4,22 @@ import {
   Column,
   Unique,
   CreateDateColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
+  OneToMany,
+  getRepository
 } from "typeorm";
-import { Length, IsNotEmpty } from "class-validator";
+import { Length } from "class-validator";
 import * as bcrypt from "bcryptjs";
+import Event from "./Event";
 
 @Entity({name: "users"})
 @Unique(["username"])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @OneToMany(type => Event, event => event.user)
+  events: Event[];
 
   @Column()
   @Length(4, 20)
@@ -102,5 +108,10 @@ export class User {
 
   checkIfUnencryptedPasswordIsValid(unencryptedPassword: string) {
     return bcrypt.compareSync(unencryptedPassword, this.password);
+  }
+
+  static getUserByID = async (id: number) => {
+    const userRepository = getRepository(User);
+    return await userRepository.find({ where: { id }});
   }
 }

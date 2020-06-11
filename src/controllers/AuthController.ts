@@ -20,13 +20,13 @@ class AuthController {
     let user: User;
     try {
       user = await userRepository.findOneOrFail({ where: { username } });
-    }catch (error) {
-      res.status(401).send( { status: 401, key: "invalid_account", message: 'Invalid account'});
+    } catch (error) {
+      res.status(401).send({ status: 401, key: "invalid_account", message: 'Invalid account' });
     }
 
     //Check if encrypted password match
     if (!user.checkIfUnencryptedPasswordIsValid(password)) {
-      res.status(401).send( { status: 401, key: "invalid_login", message: 'incorrect password entered'});
+      res.status(401).send({ status: 401, key: "invalid_login", message: 'incorrect password entered' });
       return;
     }
 
@@ -38,12 +38,12 @@ class AuthController {
     );
 
     // const cookieOptions = { httpOnly: true };
-    const cookieOptions = { };
+    const cookieOptions = {};
 
     //Send the jwt in the response
     res.status(200)
       .cookie('auth-token', token, cookieOptions)
-      .send( { status: 200, authToken: token } );
+      .send({ status: 200, authToken: token });
   };
 
   static changePassword = async (req: Request, res: Response) => {
