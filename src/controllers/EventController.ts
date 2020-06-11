@@ -1,102 +1,92 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
-import { validate } from "class-validator";
-import { Event } from "../entity/Event";
+import Event from "../entity/Event";
+import { isUndefined } from 'lodash';
+import { User } from "../entity/User";
 
-class EventController{
-  static listAll = async(req: Request, res: Response) => {
-    const eventRepository = getRepository(Event);
+class EventController {
 
-    const events = await eventRepository.find({
-      select: [ "id", "name", "eventDate", "budget", "items", "description", "location", "active" ]
-    });
-    res.send(events);
-  };
-
-  static getOneById = async (req: Request, res: Response) => {
-    //Get the ID from the url
-    const id: string = req.params.id;
-
-    //Get the user from database
-    const eventRepository = getRepository(Event);
+  static listAll = async (req: Request, res: Response) => {
     try {
-      const event = await eventRepository.findOneOrFail(id, {
-        select: [ "id", "name", "eventDate", "budget", "items", "description", "location", "active" ]
-      });
-      res.send(event);
+      const events = await Event.getAllEvents();
+      res.status(200).send(events);
     } catch (error) {
-      res.status(404).send("Event not found");
+      res.status(500).send({ error: 'something went wrong' });
     }
-  };
-
-  static createEvent = async (req: Request, res: Response) => {
-    const eventRepository = getRepository(Event);
-    let eventData = req.body.event;
-    try {
-      await eventRepository.save(eventData);
-    } catch (e) {
-      res.status(500).send("something went wrong");
-      return;
-    }
-    setTimeout(() => {  res.status(201).send("Event created"); }, 3000);
-  };
-
-  static deleteEvent = async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const eventRepository = getRepository(Event);
-    let event: Event;
-    try {
-      event = await eventRepository.findOneOrFail(id);
-    } catch (error) {
-      res.status(404).send("Event not found");
-      return;
-    }
-    eventRepository.delete(id);
-    res.status(204).send();
   }
 
-  static editEvent = async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const { name, eventDate, budget, items, description, location, active } = req.body.event;
-    const eventRepository = getRepository(Event);
-    let event;
-
+  static getOneById = async (req: Request, res: Response) => {
     try {
-      event = await eventRepository.findOneOrFail(id);
+      const event = await Event.getEventByID(parseInt(req.params.id));
+      res.status(200).send(event);
     } catch (error) {
-      res.status(404).send("Event not found");
-      return;
+      res.status(404).send({ error: "Event not found" });
     }
+  }
 
-    event.name = name;
-    event.eventDate = eventDate;
-    event.budget = budget;
-    event.items = items;
-    event.description = description;
-    event.location = location;
-    event.active = active;
-    const errors = await validate(event);
-    if (errors.length > 0) {
-      res.status(400).send(errors);
-      return;
-    }
+  static createEvent = async (req: Request, res: Response) => {
+    const eventParams = req.body;
 
     try {
-      await eventRepository.save(event);
-    } catch (e) {
-      console.log(e); // TODO: Remove this after adding synching all validations with frontend
-      res.status(409).send("some issue occured");
-      return;
+      let event = new Event(eventParams);
+      let currentUser = await EventController.getCurrentUser(req);
+
+      if (currentUser === undefined) {
+        return res.status(422).send({ error: "invalid user" });
+      }
+
+      event.user = currentUser[0];
+      const validationResult = await Event.validateEvent(event)
+      if (validationResult.length) {
+        return res.status(422).send(validationResult);
+      } else {
+        const resource = await Event.createEvent(event);
+        res.status(200).send(resource);
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({ error: 'something went wrong' });
     }
-    setTimeout(() => { res.status(204).send(); }, 3000);
+  }
 
-  };
+  static updateEvent = async (req: Request, res: Response) => {
+    try {
+      const validationResult = await Event.validateEvent(req.body);
+      if (validationResult.length) {
+        return res.status(422).send({ data: validationResult });
+      }
+      const event = Event.updateEvent(req.body);
+      res.status(200).send({ data: event });
+    } catch (error) {
+      res.status(500).send({ error: 'something went wrong' })
+    }
+  }
 
-  static listEventCards = async(req: Request, res: Response) => {
+  static deleteEvent = async (req: Request, res: Response) => {
+    const eventID = parseInt(req.params.id);
+    try {
+      const event = await Event.getEventByID(eventID);
+
+      if (isUndefined(event)) {
+        return res.status(404).send({ error: "Event not found" });
+      }
+      await Event.deleteEvent(eventID);
+      res.status(200).send({ data: event });
+
+    } catch (error) {
+      res.status(500).send({ error: "something went wrong" });
+    }
+  }
+
+  static listEventCards = async (req: Request, res: Response) => {
     res.status(201).send([
       { id: 1, cardType: "past", cardName: "past events", eventCount: 50 },
       { id: 2, cardType: "future", cardName: "future events", eventCount: 15 }
     ]);
+  }
+
+
+  private static getCurrentUser = async (req) => {
+    return await User.getUserByID(req['userID']);
   }
 }
 
