@@ -9,9 +9,9 @@ import cookieParser = require("cookie-parser");
 
 class AuthController {
   static login = async (req: Request, res: Response) => {
-    //Check if username_or_email and password are set
-    let { username_or_email, password } = req.body;
-    if (!(username_or_email && password)) {
+    //Check if usernameOrEmail and password are set
+    let { usernameOrEmail, password } = req.body;
+    if (!(usernameOrEmail && password)) {
       res.status(400).send();
     }
 
@@ -20,8 +20,8 @@ class AuthController {
     let user: User;
     user = await userRepository.createQueryBuilder()
     .where("username = :username OR email = :email", {
-      username: username_or_email,
-      email: username_or_email
+      username: usernameOrEmail,
+      email: usernameOrEmail
     }).getOne();
 
     if (!user) {
