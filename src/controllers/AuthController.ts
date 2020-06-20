@@ -9,19 +9,24 @@ import cookieParser = require("cookie-parser");
 
 class AuthController {
   static login = async (req: Request, res: Response) => {
-    //Check if username and password are set
-    let { username, password } = req.body;
-    if (!(username && password)) {
+    //Check if usernameOrEmail and password are set
+    let { usernameOrEmail, password } = req.body;
+    if (!(usernameOrEmail && password)) {
       res.status(400).send();
     }
 
     //Get user from database
     const userRepository = getRepository(User);
     let user: User;
-    try {
-      user = await userRepository.findOneOrFail({ where: { username } });
-    } catch (error) {
+    user = await userRepository.createQueryBuilder()
+    .where("username = :username OR email = :email", {
+      username: usernameOrEmail,
+      email: usernameOrEmail
+    }).getOne();
+
+    if (!user) {
       res.status(401).send({ status: 401, key: "invalid_account", message: 'Invalid account' });
+      return;
     }
 
     //Check if encrypted password match
